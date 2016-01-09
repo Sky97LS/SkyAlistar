@@ -10,7 +10,7 @@ using SharpDX;
 using System.Drawing;
 using System.Runtime.Remoting.Channels;
 
-namespace ConsoleApplication2
+namespace AlistarBySky97
 {
     class Program
     {
@@ -22,7 +22,7 @@ namespace ConsoleApplication2
         private static Menu OrbwalkerMenu;
         private static Orbwalking.Orbwalker Orbwalker;
         private static int Eslidervalue = 0;
-        
+
         public static Dictionary<SpellSlot, Spell> spells = new Dictionary<SpellSlot, Spell>()
         {
             { SpellSlot.Q, new Spell(SpellSlot.Q) },
@@ -36,7 +36,7 @@ namespace ConsoleApplication2
             CustomEvents.Game.OnGameLoad += OnLoad;
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Game_OnDraw;
-            
+
         }
 
         private static void Game_OnDraw(EventArgs args)
@@ -56,8 +56,8 @@ namespace ConsoleApplication2
                 Console.WriteLine("mah boy, you are" + Player.ChampionName + ", this script will no work for u bitch");
                 return;
             }
-            _Menu = new Menu("Alistar Script by Sky97","AlistarScriptSky", true);
-            DrawsManager= new Menu("Drawings settings","AlistarScriptSky.DrawsManager");
+            _Menu = new Menu("Alistar Script by Sky97", "AlistarScriptSky", true);
+            DrawsManager = new Menu("Drawings settings", "AlistarScriptSky.DrawsManager");
             _Menu.AddSubMenu(DrawsManager);
             {
                 DrawsManager.AddItem(new MenuItem("AlistarScriptSky.DrawsManager.rangeE", "Display E Range").SetValue(true));
@@ -65,16 +65,16 @@ namespace ConsoleApplication2
             AbilitiesManager = new Menu("Manage Abilites and Combos", "AlistarScriptSky.AbilitiesManager");
             _Menu.AddSubMenu(AbilitiesManager);
             {
-                AbilitiesManager.AddItem( new MenuItem("AlistarScriptSky.AbilitiesManager.AutoHealAllies","Auto Heal Allies nearby With Hp below x").SetValue(new Slider(0, 0, 100)));
+                AbilitiesManager.AddItem(new MenuItem("AlistarScriptSky.AbilitiesManager.AutoHealAllies", "Auto Heal Allies nearby With Hp below x").SetValue(new Slider(0, 0, 100)));
             }
             _Menu.AddToMainMenu();
             OrbwalkerMenu = new Menu("Orbwalkermenu", "AlistarScriptSky.OrbwalkerMenu");
             _Menu.AddSubMenu(OrbwalkerMenu);
             {
                 Orbwalker = new Orbwalking.Orbwalker(OrbwalkerMenu);
-                
+
             }
-           
+
 
 
         }
@@ -85,7 +85,7 @@ namespace ConsoleApplication2
             {
                 return;
             }
-           
+
             switch (Orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
@@ -95,30 +95,30 @@ namespace ConsoleApplication2
                     AlistarE();
                     break;
                 case Orbwalking.OrbwalkingMode.LastHit:
-                   
+
                     break;
                 case Orbwalking.OrbwalkingMode.LaneClear:
-                    
+
                     break;
                 default:
                     return;
             }
-            
+
         }
 
-        
+
 
         private static void AlistarE()
         {
-           
-            
+
+
             if (ObjectManager.Player.GetAlliesInRange(spells[SpellSlot.E].Range).Any(hero => hero.HealthPercent < _Menu.Item("AlistarScriptSky.AbilitiesManager.AutoHealAllies").GetValue<Slider>().Value))
             {
-                
+
                 if (spells[SpellSlot.E].IsReady())
                 {
                     spells[SpellSlot.E].Cast();
-                    
+
                 }
             }
         }
