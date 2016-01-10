@@ -30,7 +30,7 @@ namespace AlistarBySky97
         {
             { SpellSlot.Q, new Spell(SpellSlot.Q) },
             { SpellSlot.W, new Spell(SpellSlot.W, 650f) },
-            { SpellSlot.E, new Spell(SpellSlot.E, 600f) },
+            { SpellSlot.E, new Spell(SpellSlot.E, 575f) },
             { SpellSlot.R, new Spell(SpellSlot.R) }
         };
 
