@@ -29,7 +29,7 @@ namespace AlistarBySky97
         public static Dictionary<SpellSlot, Spell> spells = new Dictionary<SpellSlot, Spell>()
         {
             { SpellSlot.Q, new Spell(SpellSlot.Q) },
-            { SpellSlot.W, new Spell(SpellSlot.W) },
+            { SpellSlot.W, new Spell(SpellSlot.W, 650f) },
             { SpellSlot.E, new Spell(SpellSlot.E, 600f) },
             { SpellSlot.R, new Spell(SpellSlot.R) }
         };
@@ -48,6 +48,10 @@ namespace AlistarBySky97
             {
                 Render.Circle.DrawCircle(Player.Position, spells[SpellSlot.E].Range, System.Drawing.Color.Chartreuse, 1, false);
             }
+            if (_Menu.Item("AlistarScriptSky.DrawsManager.rangeW").GetValue<bool>())
+            {
+                Render.Circle.DrawCircle(Player.Position, spells[SpellSlot.W].Range, System.Drawing.Color.Red, 1, false);
+            }
         }
 
 
@@ -64,6 +68,7 @@ namespace AlistarBySky97
             _Menu.AddSubMenu(DrawsManager);
             {
                 DrawsManager.AddItem(new MenuItem("AlistarScriptSky.DrawsManager.rangeE", "Display E Range").SetValue(true));
+                DrawsManager.AddItem(new MenuItem("AlistarScriptSky.DrawsManager.rangeW", "Display W Range").SetValue(true));
             }
             AbilitiesManager = new Menu("Manage Abilites and Combos", "AlistarScriptSky.AbilitiesManager");
             _Menu.AddSubMenu(AbilitiesManager);
