@@ -22,6 +22,9 @@ namespace AlistarBySky97
         private static Menu OrbwalkerMenu;
         private static Orbwalking.Orbwalker Orbwalker;
         private static int Eslidervalue = 0;
+        private static Obj_AI_Hero CurrentTarget;
+        private static HeroManager Enemies;
+        
 
         public static Dictionary<SpellSlot, Spell> spells = new Dictionary<SpellSlot, Spell>()
         {
@@ -125,6 +128,31 @@ namespace AlistarBySky97
 
         private static void AlistarQWCombo()
         {
+            if (spells[SpellSlot.W].IsReady())
+            {
+                CurrentTarget = TargetSelector.GetTarget(spells[SpellSlot.W].Range, TargetSelector.DamageType.Magical);
+                if (CurrentTarget.IsValidTarget())
+                {
+                    if (spells[SpellSlot.Q].IsReady())
+                    {
+                        spells[SpellSlot.W].Cast(CurrentTarget);
+                    }
+                   
+                }
+                
+            }
+            if (!spells[SpellSlot.W].IsReady() && spells[SpellSlot.Q].IsReady())
+            {
+                if (ObjectManager.Player.CountEnemiesInRange(spells[SpellSlot.Q].Range)>=1)
+                {
+                    spells[SpellSlot.Q].Cast();
+                }
+                
+
+            }
+            
+
+
 
         }
 
