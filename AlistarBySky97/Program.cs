@@ -25,6 +25,8 @@ namespace AlistarBySky97
         private static Obj_AI_Hero CurrentTarget;
         private static HeroManager Enemies;
         
+        
+        
 
         public static Dictionary<SpellSlot, Spell> spells = new Dictionary<SpellSlot, Spell>()
         {
@@ -52,6 +54,10 @@ namespace AlistarBySky97
             {
                 Render.Circle.DrawCircle(Player.Position, spells[SpellSlot.W].Range, System.Drawing.Color.Red, 1, false);
             }
+            if (_Menu.Item("AlistarScriptSky.DrawsManager.QWComboFixer").GetValue<bool>())
+            {
+                Render.Circle.DrawCircle(Player.Position, ((spells[SpellSlot.W].Range/100)*_Menu.Item("AlistarScriptSky.AbilitiesManager.QWComboFixer").GetValue<Slider>().Value), System.Drawing.Color.Red, 1, false);
+            }
         }
 
 
@@ -60,7 +66,6 @@ namespace AlistarBySky97
             Player = ObjectManager.Player;
             if (Player.ChampionName != championName)
             {
-                Console.WriteLine("mah boy, you are" + Player.ChampionName + ", this script will no work for u bitch");
                 return;
             }
             _Menu = new Menu("Alistar Script by Sky97", "AlistarScriptSky", true);
@@ -69,11 +74,13 @@ namespace AlistarBySky97
             {
                 DrawsManager.AddItem(new MenuItem("AlistarScriptSky.DrawsManager.rangeE", "Display E Range").SetValue(true));
                 DrawsManager.AddItem(new MenuItem("AlistarScriptSky.DrawsManager.rangeW", "Display W Range").SetValue(true));
+                DrawsManager.AddItem(new MenuItem("AlistarScriptSky.DrawsManager.QWComboFixer", "Display QWComboFixer Range").SetValue(true));
             }
             AbilitiesManager = new Menu("Manage Abilites and Combos", "AlistarScriptSky.AbilitiesManager");
             _Menu.AddSubMenu(AbilitiesManager);
             {
-                AbilitiesManager.AddItem(new MenuItem("AlistarScriptSky.AbilitiesManager.AutoHealAllies", "Auto Heal Allies nearby With Hp below x").SetValue(new Slider(0, 0, 100)));
+                AbilitiesManager.AddItem(new MenuItem("AlistarScriptSky.AbilitiesManager.AutoHealAllies", "Auto Heal Allies nearby With Hp below x (in percent)").SetValue(new Slider(0, 0, 100)));
+                AbilitiesManager.AddItem(new MenuItem("AlistarScriptSky.AbilitiesManager.QWComboFixer", "Fixes the minimal range for the W jump (in percent)").SetValue(new Slider(0, 0, 100)));
             }
             _Menu.AddToMainMenu();
             OrbwalkerMenu = new Menu("Orbwalkermenu", "AlistarScriptSky.OrbwalkerMenu");
@@ -111,6 +118,7 @@ namespace AlistarBySky97
                 default:
                     return;
             }
+            
 
         }
 
@@ -133,11 +141,14 @@ namespace AlistarBySky97
 
         private static void AlistarQWCombo()
         {
-            if (spells[SpellSlot.W].IsReady())
+            //QW Combo
+            if (spells[SpellSlot.W].IsReady() && Player.Mana>=(spells[SpellSlot.W].ManaCost+spells[SpellSlot.Q].ManaCost))
             {
                 CurrentTarget = TargetSelector.GetTarget(spells[SpellSlot.W].Range, TargetSelector.DamageType.Magical);
-                if (CurrentTarget.IsValidTarget())
+                //QWComboFixer Integration
+                if (CurrentTarget.IsValidTarget() && CurrentTarget.Distance(ObjectManager.Player)>= (spells[SpellSlot.W].Range/100)*_Menu.Item("AlistarScriptSky.AbilitiesManager.QWComboFixer").GetValue<Slider>().Value)
                 {
+                    
                     if (spells[SpellSlot.Q].IsReady())
                     {
                         spells[SpellSlot.W].Cast(CurrentTarget);
@@ -150,12 +161,21 @@ namespace AlistarBySky97
             {
                 if (ObjectManager.Player.CountEnemiesInRange(spells[SpellSlot.Q].Range)>=1)
                 {
+
                     spells[SpellSlot.Q].Cast();
                 }
+
                 
 
             }
             
+            //Save the alistar!
+            if (ObjectManager.Player.HealthPercent < 10 && ObjectManager.Player.CountEnemiesInRange(1500) >= 2)
+            {
+                spells[SpellSlot.R].Cast();
+            }
+
+
 
 
 
