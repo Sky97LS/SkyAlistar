@@ -39,9 +39,6 @@ namespace AlistarBySky97
         static void Main(string[] args)
         {
             CustomEvents.Game.OnGameLoad += OnLoad;
-            Game.OnUpdate += Game_OnGameUpdate;
-            Drawing.OnDraw += Game_OnDraw;
-
         }
 
         private static void Game_OnDraw(EventArgs args)
@@ -70,28 +67,55 @@ namespace AlistarBySky97
             }
             _Menu = new Menu("Alistar Script by Sky97", "AlistarScriptSky", true);
             DrawsManager = new Menu("Drawings settings", "AlistarScriptSky.DrawsManager");
-            _Menu.AddSubMenu(DrawsManager);
             {
                 DrawsManager.AddItem(new MenuItem("AlistarScriptSky.DrawsManager.rangeE", "Display E Range").SetValue(true));
                 DrawsManager.AddItem(new MenuItem("AlistarScriptSky.DrawsManager.rangeW", "Display W Range").SetValue(true));
                 DrawsManager.AddItem(new MenuItem("AlistarScriptSky.DrawsManager.QWComboFixer", "Display QWComboFixer Range").SetValue(true));
+                _Menu.AddSubMenu(DrawsManager);
             }
+
             AbilitiesManager = new Menu("Manage Abilites and Combos", "AlistarScriptSky.AbilitiesManager");
-            _Menu.AddSubMenu(AbilitiesManager);
             {
                 AbilitiesManager.AddItem(new MenuItem("AlistarScriptSky.AbilitiesManager.AutoHealAllies", "Auto Heal Allies nearby With Hp below x (in percent)").SetValue(new Slider(0, 0, 100)));
                 AbilitiesManager.AddItem(new MenuItem("AlistarScriptSky.AbilitiesManager.QWComboFixer", "Fixes the minimal range for the W jump (in percent)").SetValue(new Slider(0, 0, 100)));
+                AbilitiesManager.AddItem(new MenuItem("AlistarScriptSky.AbilitiesManager.Antigapcloser", "Antigapcloser").SetValue(true));
+                AbilitiesManager.AddItem(new MenuItem("AlistarScriptSky.AbilitiesManager.Interrupt", "Interrupt").SetValue(true));
+                _Menu.AddSubMenu(AbilitiesManager);
             }
-            _Menu.AddToMainMenu();
+
             OrbwalkerMenu = new Menu("Orbwalkermenu", "AlistarScriptSky.OrbwalkerMenu");
-            _Menu.AddSubMenu(OrbwalkerMenu);
             {
                 Orbwalker = new Orbwalking.Orbwalker(OrbwalkerMenu);
-
+                _Menu.AddSubMenu(OrbwalkerMenu);
             }
+            _Menu.AddToMainMenu();
 
+            Game.OnUpdate += Game_OnGameUpdate;
+            Drawing.OnDraw += Game_OnDraw;
+            AntiGapcloser.OnEnemyGapcloser += OnGapcloser;
+            Interrupter2.OnInterruptableTarget += OnInterrupter;
+        }
 
+        private static void OnInterrupter(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
+        {
+            if (sender.IsValidTarget(spells[SpellSlot.Q].Range)
+                && args.DangerLevel >= Interrupter2.DangerLevel.High 
+                && spells[SpellSlot.Q].IsReady() 
+                && _Menu.Item("AlistarScriptSky.AbilitiesManager.Interrupt").GetValue<bool>())
+            {
+                spells[SpellSlot.Q].Cast();
+            }
+                 
+        }
 
+        private static void OnGapcloser(ActiveGapcloser gapcloser)
+        {
+            if (_Menu.Item("AlistarScriptSky.AbilitiesManager.Antigapcloser").GetValue<bool>() &&
+                spells[SpellSlot.W].IsReady()
+                && gapcloser.Sender.IsValidTarget(400))
+            {
+                spells[SpellSlot.W].Cast(gapcloser.Sender);
+            }
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -126,8 +150,6 @@ namespace AlistarBySky97
 
         private static void AlistarE()
         {
-
-
             if (ObjectManager.Player.GetAlliesInRange(spells[SpellSlot.E].Range).Any(hero => hero.HealthPercent < _Menu.Item("AlistarScriptSky.AbilitiesManager.AutoHealAllies").GetValue<Slider>().Value))
             {
 
@@ -157,27 +179,19 @@ namespace AlistarBySky97
                 }
                 
             }
-            if (!spells[SpellSlot.W].IsReady() && spells[SpellSlot.Q].IsReady())
+            if (!spells[SpellSlot.W].IsReady() && spells[SpellSlot.Q].IsReady() &&!ObjectManager.Player.IsDashing())
             {
                 if (ObjectManager.Player.CountEnemiesInRange(spells[SpellSlot.Q].Range)>=1)
                 {
-
                     spells[SpellSlot.Q].Cast();
                 }
-
-                
-
             }
             
             //Save the alistar!
-            if (ObjectManager.Player.HealthPercent < 10 && ObjectManager.Player.CountEnemiesInRange(1500) >= 2)
+            if (ObjectManager.Player.HealthPercent < 10 && ObjectManager.Player.CountEnemiesInRange(1500f) >= 2)
             {
                 spells[SpellSlot.R].Cast();
             }
-
-
-
-
 
         }
 
