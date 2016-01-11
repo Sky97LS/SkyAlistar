@@ -179,7 +179,7 @@ namespace AlistarBySky97
                 }
                 
             }
-            if (!spells[SpellSlot.W].IsReady() && spells[SpellSlot.Q].IsReady() &&!ObjectManager.Player.IsDashing())
+            if (!spells[SpellSlot.W].IsReady() && spells[SpellSlot.Q].IsReady())
             {
                 if (ObjectManager.Player.CountEnemiesInRange(spells[SpellSlot.Q].Range)>=1)
                 {
