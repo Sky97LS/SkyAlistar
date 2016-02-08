@@ -190,7 +190,10 @@ namespace AlistarBySky97
             //Save the alistar!
             if (ObjectManager.Player.HealthPercent < 25 && ObjectManager.Player.CountEnemiesInRange(1500f) >= 2)
             {
-                spells[SpellSlot.R].Cast();
+                if (spells[SpellSlot.R].IsReady())
+                {
+                    spells[SpellSlot.R].Cast();
+                }
             }
 
         }
